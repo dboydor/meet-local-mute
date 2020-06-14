@@ -47,36 +47,44 @@ const muteAudio = (mute) => {
 const onMessage = (action, response) => {
     let result = true
 
-    switch (action) {
-        case "start":
-            if (intervalMute) {
-                return
-            }
-
-            intervalMute = setInterval(() => {
-                let status = isMuted("David Boyd")
-                muteAudio(status === "unmuted")
-                console.log(status, Date.now())
-            }, 250)
+console.log("message: ", action)
+    switch (action.name) {
+        case "muteAll":
+            muteAudio(action.value)
             break;
 
-        case "stop":
-            if (!intervalMute) {
-                return
-            }
+        case "muteUsers":
+            // Start muting users
+            if (action.value) {
+                if (intervalMute) {
+                    return
+                }
 
-            if (intervalMute) {
-                muteAudio(false)
+                intervalMute = setInterval(() => {
+                    let status = isMuted("David Boyd")
+                    muteAudio(status === "unmuted")
+                    console.log(status, Date.now())
+                }, 250)
+            // Stop muting users
+            } else {
+                if (!intervalMute) {
+                    return
+                }
 
-                clearInterval(intervalMute)
-                delete intervalMute
+                if (intervalMute) {
+                    muteAudio(false)
+                    clearInterval(intervalMute)
+                    intervalMute = null
+                }
             }
             break;
     }
 
-    response({
-        result: result
-    });
+    if (response) {
+        response({
+            result: result
+        });
+    }
 }
 
 // Listen to messages from others
@@ -86,7 +94,8 @@ chrome.runtime.onMessage.addListener(
 });
 
 // Set initial persistent values
-chrome.storage.sync.set({ state: "stopped" });
+chrome.storage.sync.set({ muteAll: false });
+chrome.storage.sync.set({ muteUsers: false });
 chrome.storage.sync.set({ joined: false });
 
 // Poll to determine when user has joined a meeting

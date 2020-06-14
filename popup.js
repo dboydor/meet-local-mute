@@ -1,34 +1,61 @@
 let meetingJoined = false;
 
 // Wrapper to send message
-const sendMessage = (action, callback) => {
+const sendMessage = (id, value, callback) => {
 	chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-		chrome.tabs.sendMessage(tabs[0].id, { action: action }, callback)
+		chrome.tabs.sendMessage(tabs[0].id, { action: { name: id, value: value } }, callback)
 	});
 }
 
-// Update UI with the correct state
-const updateButtons = () => {
-	chrome.storage.sync.get('state', (data) => {
-		const start = document.getElementById("start")
-		const stop = document.getElementById("stop")
-
-		if (start && stop) {
-			const running = (data.state === "running")
-			start.disabled = meetingJoined ? running : true
-			stop.disabled = meetingJoined ? !running : true
+// Wrapper for storing settings
+const saveOption = (id, value, callback) => {
+	const store = {}
+	store[id] = value
+	chrome.storage.sync.set(store, () => {
+		if (callback) {
+			callback()
 		}
-	});
+	})
 }
 
-const handleClick = (id) => {
+const initializeOptions = () => {
+	const all = document.getElementById("muteAll")
+	const users = document.getElementById("muteUsers")
+
+	if (all && users) {
+		chrome.storage.sync.get('muteAll', (data) => {
+			all.checked = data.muteAll
+		});
+
+		chrome.storage.sync.get('muteUsers', (data) => {
+			users.checked = data.muteUsers
+		});
+	}
+}
+
+const updateOptions = (checkbox) => {
+	const all = document.getElementById("muteAll")
+	const users = document.getElementById("muteUsers")
+
+	if (all && users) {
+		if (checkbox === all && users.checked) {
+			users.checked = false
+			saveOption("muteUsers", false)
+			sendMessage("muteUsers", false)
+		} else if (checkbox === users && all.checked) {
+			all.checked = false
+			saveOption("muteAll", false)
+			sendMessage("muteAll", false)
+		}
+	}
+}
+
+const handleOption = (id) => {
 	let button = document.getElementById(id);
 	button.onclick = (element) => {
-		sendMessage(id, (response) => {
-			const state = id === "start" ? "running" : "stopped"
-			chrome.storage.sync.set({ state: state }, () => {
-				updateButtons()
-			})
+		saveOption(id, button.checked, () => {
+			updateOptions(button)
+			sendMessage(id, button.checked)
 		})
 	}
 }
@@ -49,7 +76,6 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     }
 });
 
-updateButtons()
-handleClick("start")
-handleClick("stop")
-
+initializeOptions()
+handleOption("muteAll")
+handleOption("muteUsers")
