@@ -18,6 +18,17 @@ const saveOption = (id, value, callback) => {
 	})
 }
 
+const updateBlocks = () => {
+	console.log("joined: ", meetingJoined)
+	if (meetingJoined) {
+		document.getElementById("waiting").style.display = "none"
+		document.querySelectorAll(".domain").forEach(element => element.style.display = "block")
+	} else {
+		document.getElementById("waiting").style.display = "block"
+		document.querySelectorAll(".domain").forEach(element => element.style.display = "none")
+	}
+}
+
 const initializeOptions = () => {
 	const all = document.getElementById("muteAll")
 	const users = document.getElementById("muteUsers")
@@ -63,19 +74,22 @@ const handleOption = (id) => {
 // Get the initial joined state
 chrome.storage.sync.get('joined', (data) => {
 	meetingJoined = data.joined
+	updateBlocks()
 })
 
 // Get notified when joined state changes
 chrome.storage.onChanged.addListener((changes, namespace) => {
+	console.log("changed: ", changes)
     for (var key in changes) {
       var changed = changes[key];
       if (key === "joined") {
           	meetingJoined = storageChange.newValue
-			updateButtons()
+			updateBlocks()
       }
     }
 });
 
+updateBlocks()
 initializeOptions()
 handleOption("muteAll")
 handleOption("muteUsers")

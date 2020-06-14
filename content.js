@@ -101,6 +101,7 @@ chrome.storage.sync.set({ joined: false });
 // Poll to determine when user has joined a meeting
 setInterval(() => {
     const joined = document.querySelector("[__is_owner]") !== null && document.querySelector("[data-user-identifier]") === null
+    console.log("Joined: ", joined)
     chrome.storage.sync.set({ joined: joined });
 }, 1000)
 
