@@ -1,3 +1,5 @@
+let intervalMute
+
 // Checks if a user is muted or not
 const isMuted = (user) => {
     const found = document.querySelectorAll("div")
@@ -52,11 +54,11 @@ const onMessage = (action, response) => {
 
     switch (action) {
         case "start":
-            if (window.meetMuter) {
+            if (intervalMute) {
                 return
             }
 
-            window.meetMuter = setInterval(() => {
+            intervalMute = setInterval(() => {
                 let status = isMuted("David Boyd")
                 muteAudio(status === "unmuted")
                 console.log(status, Date.now())
@@ -64,17 +66,15 @@ const onMessage = (action, response) => {
             break;
 
         case "stop":
-            if (!window.meetMuter) {
+            if (!intervalMute) {
                 return
             }
 
-            if (window.meetMuter) {
-                clearInterval(window.meetMuter)
-                delete window.meetMuter
-                let status = document.querySelector("[role=status]")
-                if (status) {
-                    status.innerText = "STOPPED"
-                }
+            if (intervalMute) {
+                muteAudio(false)
+
+                clearInterval(intervalMute)
+                delete intervalMute
             }
             break;
     }
@@ -99,5 +99,4 @@ setInterval(() => {
     const joined = document.querySelector("[__is_owner]") !== null && document.querySelector("[data-user-identifier]") === null
     chrome.storage.sync.set({ joined: joined });
 }, 1000)
-
 
