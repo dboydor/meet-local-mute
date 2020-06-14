@@ -1,7 +1,7 @@
 {
-  "name": "Getting Started Example",
+  "name": "Meet Local Mute",
   "version": "1.0",
-  "description": "Build an Extension!",
+  "description": "Allows you to locallyl mute audio for Google Meet",
   "permissions": ["activeTab", "declarativeContent", "storage"],
 	"background": {
 	  "scripts": ["background.js"],
