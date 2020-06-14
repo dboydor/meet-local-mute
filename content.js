@@ -2,24 +2,20 @@ let intervalMute
 
 // Checks if a user is muted or not
 const isMuted = (user) => {
-    const found = document.querySelectorAll("div")
+    const found = document.querySelectorAll("div[jscontroller] > div[data-self-name]")
     for (let x = 0; x < found.length; x++) {
         const element = found[x]
         if (element.textContent === user) {
-            if (   element.hasAttribute("jscontroller")
-                && element.hasAttribute("jsaction")
-                && element.hasAttribute("jsname")
-                && !element.hasAttribute("data-layout")) {
-
-              const found2 = element.querySelectorAll("div")
-              for (let y = 0; y < found2.length; y++) {
-                  const element = found2[y]
-                  if (element.children.length === 3) {
+            const sibling = element.previousElementSibling
+            const found2 = sibling.querySelectorAll("div")
+            for (let y = 0; y < found2.length; y++) {
+                const element = found2[y]
+                if (element.children.length === 3) {
                     let count = 0
                     for (let z = 0; z < element.children.length; z++) {
-                      if (element.children[z].nodeName === "DIV") {
-                          count++
-                      }
+                        if (element.children[z].nodeName === "DIV") {
+                            count++
+                        }
                     }
                     if (count === 3) {
                         const rect = element.getBoundingClientRect()
@@ -31,8 +27,7 @@ const isMuted = (user) => {
                             return "unmuted"
                         }
                     }
-                  }
-              }
+                }
             }
         }
     }
