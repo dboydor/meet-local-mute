@@ -1,16 +1,40 @@
-<!DOCTYPE html>
-<html>
+<html lang="en-US" dir="ltr" data-platform="chromium" data-application="chrome">
     <head>
-        <style>
-            button {
-                height: 60px;
-                width: 60px;
-            }
-        </style>
+        <title>Meet Mute</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="popup.css" />
     </head>
-    <body>
-    	<button id="start">Start</button>
-    	<button id="stop" disabled>Stop</button>
+    <body class="" tabindex="1">
+        <main>
+            <div id="page-status">
+                <h2 data-i18n="status_header">Meet Mute</h2>
+                <div class="domain">
+                    <div class="details">
+                        <h3 data-i18n="status_domain">Mute audio for meeting</h3>
+                    </div>
+                    <label class="switch">
+                      <input id="mute-all" type="checkbox">
+                      <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <br/>
+                <div class="domain">
+                    <div class="details">
+                      <h3 data-i18n="status_domain">Automatically mute audio if any of these users are unmuted</h3>
+                    </div>
+                    <label class="switch">
+                      <input id="mute-users" type="checkbox">
+                      <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+          <br/><br/>
+          <button id="start">Start</button>
+          <button id="stop" disabled>Stop</button>
+        </main>
+
         <script src="popup.js"></script>
     </body>
 </html>
