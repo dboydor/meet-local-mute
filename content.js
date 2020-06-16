@@ -1,8 +1,12 @@
 let intervalMute
 
+const getUsers = () => {
+    return document.querySelectorAll("div[jscontroller] > div[data-self-name]")
+}
+
 // Checks if a user is muted or not
 const isMuted = (user) => {
-    const found = document.querySelectorAll("div[jscontroller] > div[data-self-name]")
+    const found = getUsers()
     for (let x = 0; x < found.length; x++) {
         const element = found[x]
         if (element.textContent === user) {
@@ -100,8 +104,7 @@ chrome.storage.sync.set({ joined: false });
 
 // Poll to determine when user has joined a meeting
 setInterval(() => {
-    const joined = document.querySelector("[__is_owner]") !== null && document.querySelector("[data-user-identifier]") === null
-    console.log("Joined: ", joined)
+    const joined = getUsers().length != 0
     chrome.storage.sync.set({ joined: joined });
 }, 1000)
 

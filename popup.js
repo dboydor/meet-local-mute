@@ -22,9 +22,9 @@ const updateBlocks = () => {
 	console.log("joined: ", meetingJoined)
 	if (meetingJoined) {
 		document.getElementById("waiting").style.display = "none"
-		document.querySelectorAll(".domain").forEach(element => element.style.display = "block")
+		document.querySelectorAll(".domain").forEach(element => element.style.display = "flex")
 	} else {
-		document.getElementById("waiting").style.display = "block"
+		document.getElementById("waiting").style.display = "flex"
 		document.querySelectorAll(".domain").forEach(element => element.style.display = "none")
 	}
 }
