@@ -2,9 +2,9 @@ let meetingJoined = false;
 let people = []
 
 // Wrapper to send message
-const sendMessage = (id, value, callback) => {
+const sendMessage = (id, value, data) => {
 	chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-		chrome.tabs.sendMessage(tabs[0].id, { action: { name: id, value: value } }, callback)
+		chrome.tabs.sendMessage(tabs[0].id, { action: { name: id, value: value, data: data } })
 	});
 }
 
@@ -86,7 +86,7 @@ const handleOption = (id) => {
 		}
 		saveOption(id, button.checked, () => {
 			updateOptions(button)
-			sendMessage(id, button.checked)
+			sendMessage(id, button.checked, people)
 		})
 	}
 }
@@ -173,7 +173,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     for (var key in changes) {
       var changed = changes[key];
       if (key === "joined") {
-          	meetingJoined = storageChange.newValue
+          	meetingJoined = changed.newValue
 			updateBlocks()
       }
     }

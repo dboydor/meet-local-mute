@@ -1,4 +1,5 @@
 let intervalMute
+let people
 
 const getUsers = () => {
     return document.querySelectorAll("div[jscontroller] > div[data-self-name]")
@@ -27,7 +28,7 @@ const isMuted = (user) => {
                             //console.log(user + " is muted")
                             return "muted"
                         } else {
-                            console.log(user + " is un-muted")
+                            //console.log(user + " is un-muted")
                             return "unmuted"
                         }
                     }
@@ -64,10 +65,13 @@ console.log("message: ", action)
                     return
                 }
 
+                people = action.data
                 intervalMute = setInterval(() => {
-                    let status = isMuted("David Boyd")
-                    muteAudio(status === "unmuted")
-                    console.log(status, Date.now())
+                    if (people && people.length) {
+                        let unmuted = people.some(person => isMuted(person) === "unmuted")
+                        muteAudio(unmuted)
+                        console.log("unmuted:" , unmuted, ", ", people)
+                    }
                 }, 250)
             // Stop muting users
             } else {
@@ -95,6 +99,16 @@ console.log("message: ", action)
 chrome.runtime.onMessage.addListener(
     (request, sender, sendResponse) => {
         onMessage(request.action, sendResponse)
+});
+
+// Get notified when people array changes
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    for (var key in changes) {
+      var changed = changes[key];
+      if (key === "people") {
+        people = changed.newValue
+      }
+    }
 });
 
 // Set initial persistent values
