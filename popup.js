@@ -1,4 +1,5 @@
 let meetingJoined = false;
+let people = []
 
 // Wrapper to send message
 const sendMessage = (id, value, callback) => {
@@ -19,13 +20,28 @@ const saveOption = (id, value, callback) => {
 }
 
 const updateBlocks = () => {
-	console.log("joined: ", meetingJoined)
 	if (meetingJoined) {
 		document.getElementById("waiting").style.display = "none"
-		document.querySelectorAll(".domain").forEach(element => element.style.display = "flex")
+		document.getElementById("joined").style.display = "inline-block"
 	} else {
 		document.getElementById("waiting").style.display = "flex"
-		document.querySelectorAll(".domain").forEach(element => element.style.display = "none")
+		document.getElementById("joined").style.display = "none"
+	}
+}
+
+
+const updateList = () => {
+	let list = document.getElementById("people")
+	if (list) {
+		while (list.firstChild) {
+		    list.removeChild(list.firstChild);
+		}
+		people.forEach(person => {
+			let option = document.createElement("option");
+			option.setAttribute("value", person);
+			option.text = person
+			list.appendChild(option);
+		})
 	}
 }
 
@@ -64,12 +80,87 @@ const updateOptions = (checkbox) => {
 const handleOption = (id) => {
 	let button = document.getElementById(id);
 	button.onclick = (element) => {
+		if (id === "muteUsers" && people.length === 0) {
+			button.checked = false
+			return
+		}
 		saveOption(id, button.checked, () => {
 			updateOptions(button)
 			sendMessage(id, button.checked)
 		})
 	}
 }
+
+const handleAdd = () => {
+	var openIt = document.getElementById("add");
+	var modal = document.getElementById("modalAdd");
+
+	// Get the <span> element that closes the modal
+	var close = document.getElementsByClassName("close")[0];
+
+	// When the user clicks on the button, open the modal
+	openIt.onclick = () => {
+		modal.style.display = "block";
+
+		let text = document.getElementById("addName")
+		text.value = "";
+		text.focus()
+
+		let addIt = document.getElementById("addPerson")
+		addIt.onclick = () => {
+			if (people.indexOf(text.value) === -1) {
+				people.push(text.value)
+			}
+			saveOption("people", people)
+			modal.style.display = "none"
+			updateList()
+		}
+	}
+
+	// When the user clicks on <span> (x), close the modal
+	close.onclick = () => {
+		modal.style.display = "none";
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = (event) => {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
+}
+
+const handleRemove = () => {
+	var remove = document.getElementById("remove");
+	remove.onclick = () => {
+		let list = document.getElementById("people")
+		if (list) {
+			if (list.selectedIndex >= 0) {
+				people.splice(list.selectedIndex, 1)
+				saveOption("people", people)
+				updateList()
+
+				if (!people.length) {
+					const users = document.getElementById("muteUsers")
+					users.checked = false
+					saveOption("muteUsers", false)
+					sendMessage("muteUsers", false)
+
+				}
+			}
+		}
+
+	}
+}
+
+// Get the initial people to mute
+chrome.storage.sync.get('people', (data) => {
+	people = data.people
+	if (!people) {
+		people = []
+	}
+	updateList()
+})
 
 // Get the initial joined state
 chrome.storage.sync.get('joined', (data) => {
@@ -79,7 +170,6 @@ chrome.storage.sync.get('joined', (data) => {
 
 // Get notified when joined state changes
 chrome.storage.onChanged.addListener((changes, namespace) => {
-	console.log("changed: ", changes)
     for (var key in changes) {
       var changed = changes[key];
       if (key === "joined") {
@@ -89,7 +179,8 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     }
 });
 
-updateBlocks()
+handleAdd()
+handleRemove()
 initializeOptions()
 handleOption("muteAll")
 handleOption("muteUsers")

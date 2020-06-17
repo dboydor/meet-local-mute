@@ -10,31 +10,50 @@
                 <h2 data-i18n="status_header">Meet Mute</h2>
                 <div id="waiting">Waiting for meeting to be joined...</div>
 
-                <div class="domain">
-                    <div class="details">
-                        <h3 data-i18n="status_domain">Mute audio for meeting</h3>
+                <div id="joined" style="display: inline-block">
+                    <div class="domain">
+                        <div class="details">
+                            <h3 data-i18n="status_domain">Mute audio for meeting</h3>
+                        </div>
+                        <label class="switch">
+                          <input id="muteAll" type="checkbox">
+                          <span class="slider round"></span>
+                        </label>
                     </div>
-                    <label class="switch">
-                      <input id="muteAll" type="checkbox">
-                      <span class="slider round"></span>
-                    </label>
-                </div>
 
-                <br/>
-                <div class="domain">
-                    <div class="details">
-                      <h3 data-i18n="status_domain">Automatically mute audio if any of these users are unmuted</h3>
+                    <br/>
+                    <div class="domain">
+                        <div class="details">
+                          <h3 data-i18n="status_domain">Automatically mute audio if any of these people are unmuted</h3>
+                        </div>
+                        <label class="switch">
+                          <input id="muteUsers" type="checkbox">
+                          <span class="slider round"></span>
+                        </label>
                     </div>
-                    <label class="switch">
-                      <input id="muteUsers" type="checkbox">
-                      <span class="slider round"></span>
-                    </label>
+
+                    <br/>
+                    <select id="people" style="width: 100%; height: 120px" size="3" multiple="multiple">
+                    </select>
+                    <br/><br/>
+                    <button id="add">Add</button>
+                    <button id="remove">Remove</button>
                 </div>
             </div>
-
-          <br/><br/>
         </main>
 
+        <!-- Add a new person -->
+        <div id="modalAdd" class="modal">
+
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Enter person's full name:</p>
+            <input id="addName" type="text" style="width: 100%"/>
+            <br/><br/>
+            <button id="addPerson">Add</button>
+          </div>
+
+        </div>
         <script src="popup.js"></script>
     </body>
 </html>
