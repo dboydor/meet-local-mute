@@ -2,7 +2,7 @@
   "name": "Meet Mute",
   "version": "1.0.0",
   "description": "Allows you to locally mute audio for Google Meet",
-  "permissions": ["activeTab", "declarativeContent", "storage"],
+  "permissions": ["declarativeContent", "storage"],
 	"background": {
 	  "scripts": ["background.js"],
 	  "persistent": false

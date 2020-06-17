@@ -52,7 +52,7 @@ const muteAudio = (mute) => {
 const onMessage = (action, response) => {
     let result = true
 
-console.log("message: ", action)
+    // console.log("message: ", action)
     switch (action.name) {
         case "muteAll":
             muteAudio(action.value)
@@ -70,7 +70,7 @@ console.log("message: ", action)
                     if (people && people.length) {
                         let unmuted = people.some(person => isMuted(person) === "unmuted")
                         muteAudio(unmuted)
-                        console.log("unmuted:" , unmuted, ", ", people)
+                        // console.log("unmuted:" , unmuted, ", ", people)
                     }
                 }, 250)
             // Stop muting users

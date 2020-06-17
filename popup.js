@@ -145,7 +145,6 @@ const handleRemove = () => {
 					users.checked = false
 					saveOption("muteUsers", false)
 					sendMessage("muteUsers", false)
-
 				}
 			}
 		}
