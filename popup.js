@@ -162,7 +162,7 @@ chrome.storage.sync.get('people', (data) => {
 })
 
 // Get the initial joined state
-chrome.storage.sync.get('joined', (data) => {
+chrome.storage.local.get('joined', (data) => {
 	meetingJoined = data.joined
 	updateBlocks()
 })

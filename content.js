@@ -1,5 +1,6 @@
 let intervalMute
 let people
+let joined = false
 
 const getUsers = () => {
     return document.querySelectorAll("div[jscontroller] > div[data-self-name]")
@@ -114,11 +115,14 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 // Set initial persistent values
 chrome.storage.sync.set({ muteAll: false });
 chrome.storage.sync.set({ muteUsers: false });
-chrome.storage.sync.set({ joined: false });
+chrome.storage.local.set({ joined: false });
 
 // Poll to determine when user has joined a meeting
 setInterval(() => {
-    const joined = getUsers().length != 0
-    chrome.storage.sync.set({ joined: joined });
+    const isJoined = getUsers().length != 0
+    if (isJoined !== joined) {
+        chrome.storage.local.set({ joined: isJoined });
+        joined = isJoined;
+    }
 }, 1000)
 
