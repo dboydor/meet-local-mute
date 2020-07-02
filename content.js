@@ -1,9 +1,8 @@
-let intervalMute
 let observer
 let people
-let joined = false
-let meeting = {}
+let currentSpeaker
 let muted = false
+let joined = false
 
 const getUsers = () => {
     return document.querySelectorAll("div[jscontroller] > div[data-self-name]")
@@ -32,6 +31,16 @@ const isSpeaker = (element) => {
     return false
 }
 
+const setSpeaker = (person) => {
+    currentSpeaker = person
+    if (people.some(person2 => person2.trim() === person.trim())) {
+        console.log(person, " is speaking, muting audio")
+        muteAudio(true)
+    } else {
+        muteAudio(false)
+    }
+}
+
 // Callback function to execute when mutations are observed
 const watch = (mutationsList, observer) => {
     for (let mutation of mutationsList) {
@@ -47,8 +56,7 @@ const watch = (mutationsList, observer) => {
                         const sibling = parent.nextElementSibling
                         const person = sibling.textContent
                         if (person.length) {
-                            meeting[person] = Date.now()
-                            //console.log("Speaking: ", person)
+                            setSpeaker(person)
                         }
                     }
 
@@ -61,8 +69,7 @@ const watch = (mutationsList, observer) => {
                         const child = parent.childNodes[1].childNodes[0]
                         const person = child.textContent
                         if (person.length) {
-                            meeting[person] = Date.now()
-                            //console.log("Speaking: ", person)
+                            setSpeaker(person)
                         }
                     }
                 }
@@ -72,8 +79,6 @@ const watch = (mutationsList, observer) => {
 };
 
 const startListening = () => {
-    meeting = {}
-
     let config = {
         attributes: true,
         subtree: true
@@ -100,31 +105,15 @@ const muteAudio = (mute) => {
     document.querySelectorAll("audio").forEach(element => {
         element.muted = mute
     })
+
     muted = mute
+    if (!mute) {
+        console.log("unmuting audio")
+    }
   }
 }
 
-const muteSpeakers = (delay) => {
-    const list = Object.keys(meeting)
-    for (let x = 0; x < list.length; x++) {
-        const person = list[x]
-        const elapsed = (Date.now() - meeting[person])
-        const speaking = elapsed <= 1000
-        // if (elapsed > 1000) {
-        //     console.log("elapsed: ", elapsed)
-        // }
-        if (speaking && people.some(person2 => person2.trim() === person.trim())) {
-            console.log(person, " is speaking, muting audio")
-            muteAudio(true)
-            return
-        }
-    }
-
-    console.log("unmuting audio")
-    muteAudio(false)
-}
-
-// Message handelr
+// Message handler
 const onMessage = (action, response) => {
     let result = true
 
@@ -137,30 +126,13 @@ const onMessage = (action, response) => {
         case "muteUsers":
             // Start muting users
             if (action.value) {
-                if (intervalMute) {
-                    return
-                }
-
+                people = action.data
                 startListening()
 
-                people = action.data
-                intervalMute = setInterval(() => {
-                    if (people && people.length) {
-                        muteSpeakers(250)
-                    }
-                }, 250)
             // Stop muting users
             } else {
-                if (!intervalMute) {
-                    return
-                }
-
-                if (intervalMute) {
-                    stopListening()
-                    muteAudio(false)
-                    clearInterval(intervalMute)
-                    intervalMute = null
-                }
+                stopListening()
+                muteAudio(false)
             }
             break;
     }
