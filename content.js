@@ -37,6 +37,7 @@ const setSpeaker = (person) => {
         console.log(person, " is speaking, muting audio")
         muteAudio(true)
     } else {
+        console.log(person, " is speaking, un-muting audio")
         muteAudio(false)
     }
 }
@@ -107,9 +108,6 @@ const muteAudio = (mute) => {
     })
 
     muted = mute
-    if (!mute) {
-        console.log("unmuting audio")
-    }
   }
 }
 
